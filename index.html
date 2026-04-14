@@ -160,22 +160,44 @@ productos.push({nombre,precio});
 renderProductos();
 }
 
+function obtenerFecha() {
+  const hoy = new Date();
+
+  const dia = String(hoy.getDate()).padStart(2, '0');
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const año = hoy.getFullYear();
+
+  return `${dia}/${mes}/${año}`;
+}
+
 function generarReporte(){
-let total=ventas.reduce((s,v)=>s+v.precio,0);
-alert(`Total vendido: $${total}\nProductos vendidos: ${ventas.length}`);
+  let total = ventas.reduce((s,v)=>s+v.precio,0);
+  let fecha = obtenerFecha();
+
+  alert(`📊 REPORTE DEL DÍA
+Fecha: ${fecha}
+
+Total vendido: $${total}
+Productos vendidos: ${ventas.length}`);
 }
 
 function descargarImagen(){
 let canvas=document.getElementById("canvas");
 let ctx=canvas.getContext("2d");
+let fecha = obtenerFecha();
 
 canvas.width=400;
 canvas.height=300;
 
+
 ctx.fillStyle="#111";
 ctx.fillRect(0,0,400,300);
 
-ctx.fillStyle="#ff2e88";
+ctx.fillStyle = "#fff";
+ctx.font = "14px Poppins";
+ctx.fillText("Fecha: " + fecha, 50, 80);
+
+ctx.fillStyle="#853922";
 ctx.font="20px Poppins";
 ctx.fillText("Reporte del día",100,40);
 
@@ -183,8 +205,8 @@ let total=ventas.reduce((s,v)=>s+v.precio,0);
 
 ctx.fillStyle="#fff";
 ctx.font="16px Poppins";
-ctx.fillText("Total: $"+total,50,120);
-ctx.fillText("Productos vendidos: "+ventas.length,50,160);
+ctx.fillText("Total: $"+total,50,140);
+ctx.fillText("Productos vendidos: "+ventas.length,50,180);
 
 let link=document.createElement("a");
 link.download="reporte.png";
