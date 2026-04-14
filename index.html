@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cafetería App Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#0f0f0f,#1c1c1c);
+  color:#fff;
+}
+header{
+  padding:20px;
+  text-align:center;
+  font-size:1.5rem;
+  font-weight:700;
+  color:#9a3b19;
+}
+.container{padding:15px;max-width:900px;margin:auto}
+.card{
+  background:#1a1a1a;
+  border-radius:15px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.5);
+}
+.productos{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:10px;
+}
+button{
+  border:none;
+  border-radius:12px;
+  padding:12px;
+  background:#853922;
+  color:#fff;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.2s;
+}
+button:active{transform:scale(0.95)}
+button.secondary{background:#333}
+input{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:10px;
+  border:none;
+}
+.lista-ventas .item{
+  display:flex;
+  justify-content:space-between;
+  background:#222;
+  padding:10px;
+  border-radius:10px;
+  margin:5px 0;
+}
+.total{
+  font-size:1.2rem;
+  text-align:center;
+  margin-top:10px;
+  color:#00ffae;
+}
+</style>
+</head>
+<body>
+
+<header>☕ Cafetería Selah</header>
+
+<div class="container">
+
+<div class="card">
+<h3>Total del día: $<span id="total">0</span></h3>
+</div>
+
+<div class="card">
+<h3>Productos</h3>
+<div class="productos" id="productos"></div>
+</div>
+
+<div class="card">
+<h3>Agregar producto</h3>
+<input type="text" id="nombre" placeholder="Nombre">
+<input type="number" id="precio" placeholder="Precio">
+<button onclick="agregarProducto()">Agregar</button>
+</div>
+
+<div class="card">
+<h3>Ventas del día</h3>
+<div class="lista-ventas" id="ventas"></div>
+</div>
+
+<div class="card">
+<button onclick="generarReporte()">📊 Generar reporte</button>
+<button class="secondary" onclick="descargarImagen()">📸 Descargar reporte</button>
+</div>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+</div>
+
+<script>
+let productos=[
+{nombre:"Americano",precio:30},
+{nombre:"Latte",precio:45},
+{nombre:"Capuccino",precio:40}
+];
+
+let ventas=[];
+
+function renderProductos(){
+const cont=document.getElementById("productos");
+cont.innerHTML="";
+productos.forEach((p,i)=>{
+let btn=document.createElement("button");
+btn.innerText=p.nombre+" $"+p.precio;
+btn.onclick=()=>vender(i);
+cont.appendChild(btn);
+});
+}
+
+function vender(i){
+ventas.push(productos[i]);
+renderVentas();
+}
+
+function renderVentas(){
+const cont=document.getElementById("ventas");
+cont.innerHTML="";
+let total=0;
+ventas.forEach((v,i)=>{
+let div=document.createElement("div");
+div.className="item";
+
+div.innerHTML=`${v.nombre} $${v.precio} <button onclick="eliminar(${i})">X</button>`;
+
+cont.appendChild(div);
+
+total+=v.precio;
+});
+
+document.getElementById("total").innerText=total;
+}
+
+function eliminar(i){
+ventas.splice(i,1);
+renderVentas();
+}
+
+function agregarProducto(){
+let nombre=document.getElementById("nombre").value;
+let precio=parseFloat(document.getElementById("precio").value);
+if(!nombre||!precio)return alert("Datos inválidos");
+productos.push({nombre,precio});
+renderProductos();
+}
+
+function generarReporte(){
+let total=ventas.reduce((s,v)=>s+v.precio,0);
+alert(`Total vendido: $${total}\nProductos vendidos: ${ventas.length}`);
+}
+
+function descargarImagen(){
+let canvas=document.getElementById("canvas");
+let ctx=canvas.getContext("2d");
+
+canvas.width=400;
+canvas.height=300;
+
+ctx.fillStyle="#111";
+ctx.fillRect(0,0,400,300);
+
+ctx.fillStyle="#ff2e88";
+ctx.font="20px Poppins";
+ctx.fillText("Reporte del día",100,40);
+
+let total=ventas.reduce((s,v)=>s+v.precio,0);
+
+ctx.fillStyle="#fff";
+ctx.font="16px Poppins";
+ctx.fillText("Total: $"+total,50,120);
+ctx.fillText("Productos vendidos: "+ventas.length,50,160);
+
+let link=document.createElement("a");
+link.download="reporte.png";
+link.href=canvas.toDataURL();
+link.click();
+}
+
+renderProductos();
+</script>
+
+</body>
+</html>
